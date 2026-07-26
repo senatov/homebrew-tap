@@ -13,7 +13,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Check out tap
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Update from latest MiMiNavigator release
         env:
@@ -47,7 +47,9 @@ jobs:
         run: |
           set -euo pipefail
           brew style Casks/miminavigator.rb
-          brew audit --cask --strict Casks/miminavigator.rb
+          brew tap senatov/tap
+          cp Casks/miminavigator.rb "$(brew --repository senatov/tap)/Casks/miminavigator.rb"
+          brew audit --cask --strict senatov/tap/miminavigator
 
       - name: Publish update
         shell: zsh {0}
