@@ -1,6 +1,6 @@
 cask "miminavigator" do
   version "0.9.9.7.2"
-  sha256 "e4dd5950a34612002f7ba1322aa5c8983e340df5cd9585ce523cc917cf1b622f"
+  sha256 "1ec1b803e776765afb0b65781c0f78d6a430cf67f47e80b557afcc74083ced7c"
 
   url "https://github.com/senatov/MiMiNavigator/releases/download/v#{version}/MiMiNavigator-#{version}.dmg"
   name "MiMiNavigator"
