@@ -1,0 +1,51 @@
+#!/bin/sh
+
+set -eu
+
+readonly cask="senatov/tap/miminavigator"
+readonly app="/Applications/MiMiNavigator.app"
+readonly plist="$app/Contents/Info.plist"
+
+version_compare() {
+  awk -v left="$1" -v right="$2" 'BEGIN {
+    left_count = split(left, left_parts, ".")
+    right_count = split(right, right_parts, ".")
+    count = left_count > right_count ? left_count : right_count
+
+    for (index = 1; index <= count; index++) {
+      left_part = left_parts[index] + 0
+      right_part = right_parts[index] + 0
+      if (left_part > right_part) exit 0
+      if (left_part < right_part) exit 1
+    }
+
+    exit 0
+  }'
+}
+
+brew tap senatov/tap >/dev/null
+brew update >/dev/null
+
+available_version="$({
+  brew info --json=v2 --cask "$cask" |
+    plutil -extract casks.0.version raw -o - -
+} 2>/dev/null)"
+
+installed_version=""
+if [ -f "$plist" ]; then
+  installed_version="$(plutil -extract CFBundleShortVersionString raw "$plist" 2>/dev/null || true)"
+fi
+
+# Homebrew compares against its receipt, not the bundle in /Applications. Do
+# not let an older or identical cask replace an app installed by another path.
+if [ -n "$installed_version" ] && version_compare "$installed_version" "$available_version"; then
+  printf 'MiMiNavigator %s is already installed; available version is %s.\n' \
+    "$installed_version" "$available_version"
+  exit 0
+fi
+
+if brew list --cask miminavigator >/dev/null 2>&1; then
+  HOMEBREW_NO_AUTO_UPDATE=1 brew reinstall --cask --force "$cask"
+else
+  HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask --force "$cask"
+fi
