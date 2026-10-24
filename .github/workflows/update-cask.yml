@@ -32,13 +32,27 @@ jobs:
           fi
           gh api -H "Accept: application/octet-stream" "${asset_api_url}" > "${RUNNER_TEMP}/${asset_name}"
           sha256="$(shasum -a 256 "${RUNNER_TEMP}/${asset_name}" | awk '{print $1}')"
+          mount_dir="${RUNNER_TEMP}/miminavigator-release"
+          mkdir -p "${mount_dir}"
+          trap 'diskutil eject "${mount_dir}" >/dev/null 2>&1 || true' EXIT
+          diskutil image attach --readOnly --mountOptions nobrowse --mountPoint "${mount_dir}" "${RUNNER_TEMP}/${asset_name}" >/dev/null
+          minimum_os="$(plutil -extract LSMinimumSystemVersion raw -o - "${mount_dir}/MiMiNavigator.app/Contents/Info.plist")"
+          diskutil eject "${mount_dir}" >/dev/null
+          trap - EXIT
+          case "${minimum_os%%.*}" in
+            26) macos_symbol="tahoe" ;;
+            27) macos_symbol="golden_gate" ;;
+            *) print -u2 "Unsupported minimum macOS version: ${minimum_os}"; exit 1 ;;
+          esac
           export VERSION="${version}"
           export SHA256="${sha256}"
+          export MACOS_SYMBOL="${macos_symbol}"
           ruby -e '
             path = "Casks/miminavigator.rb"
             contents = File.read(path)
             contents.sub!(/version "[^"]+"/, "version \"#{ENV.fetch("VERSION")}\"")
             contents.sub!(/sha256 "[0-9a-f]+"/, "sha256 \"#{ENV.fetch("SHA256")}\"")
+            contents.sub!(/depends_on macos: :[a-z_]+/, "depends_on macos: :#{ENV.fetch("MACOS_SYMBOL")}")
             File.write(path, contents)
           '
 
