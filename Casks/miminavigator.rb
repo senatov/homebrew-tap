@@ -1,13 +1,13 @@
 cask "miminavigator" do
-  version "0.9.1.2"
-  sha256 "99506da0f370943bb1302561f6cb2fe6b6ba3ad8efe5f18d84745adc7c6dc7ee"
+  version "0.9.1.3"
+  sha256 "e42c95570a46411a9a3e63261f959a561c4f293efe5f0c283fbd8f1ba991deae"
 
   url "https://github.com/senatov/MiMiNavigator/releases/download/v#{version}/MiMiNavigator-#{version}.dmg"
   name "MiMiNavigator"
   desc "Dual-panel file manager"
   homepage "https://github.com/senatov/MiMiNavigator"
 
-  depends_on macos: :tahoe
+  depends_on macos: :golden_gate
 
   app "MiMiNavigator.app"
 

@@ -21,6 +21,10 @@ The installer compares the cask version with `CFBundleShortVersionString` from
 the installed application. It only replaces the application when the cask is
 newer; equal or older cask versions are treated as a successful no-op.
 
+MiMiNavigator v0.9.1.3 and newer require macOS 27 or later. The cask and
+version-aware installer reject older systems before installation. For macOS 26,
+download the final compatible [v0.9.1.2 release](https://github.com/senatov/MiMiNavigator/releases/tag/v0.9.1.2).
+
 ## Upgrade
 
 ```zsh
